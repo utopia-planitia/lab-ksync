@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devcicd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devcicd
+  template:
+    metadata:
+      labels:
+        app: devcicd
+    spec:
+      containers:
+      - name: php
+        image: php:7-alpine
+        command: ["sh", "-c"]
+        args:
+          - "mkdir -p public && php -S 0.0.0.0:8080 -t public"
+        workingDir: /var/www
+        ports:
+        - containerPort: 8080
+          name: public
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devcicd
+spec:
+  selector:
+    app: devcicd
+  ports:
+    - port: 8080
+      name: public
+      protocol: TCP
